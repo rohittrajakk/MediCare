@@ -16,7 +16,7 @@
 3.  Click the **Arguments** tab.
 4.  In the **VM Arguments** box (the bottom one), paste this EXACTLY:
     ```
-    -DDB_USERNAME=postgres -DDB_PASSWORD=Rohit@123
+    -DDB_USERNAME=postgres -DDB_PASSWORD=********
     ```
 5.  Click **Apply** and **Run**.
 
