@@ -1,13 +1,6 @@
-![alt text](image.png)# 🏥 MediCare - Hospital Management System
+ MediCare - Hospital Management System
 
 A production-ready Hospital Management System built with **Spring Boot 3** and **React**.
-
-![Java](https://img.shields.io/badge/Java-17-orange)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.9-green)
-![React](https://img.shields.io/badge/React-18-blue)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
-
----
 
 ## ✨ Features
 
