@@ -1,0 +1,355 @@
+{
+    "info": {
+        "name": "MediCare Hospital Management System",
+        "description": "Complete API collection for MediCare HMS - 20+ endpoints covering patients, doctors, appointments, medical records, payments, and admin",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080/api"
+        },
+        {
+            "key": "patientId",
+            "value": "1"
+        },
+        {
+            "key": "doctorId",
+            "value": "1"
+        },
+        {
+            "key": "appointmentId",
+            "value": "1"
+        },
+        {
+            "key": "recordId",
+            "value": "1"
+        },
+        {
+            "key": "paymentId",
+            "value": "1"
+        }
+    ],
+    "item": [
+        {
+            "name": "Patients",
+            "item": [
+                {
+                    "name": "1. Register Patient",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/patients/register",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"9876543210\",\n  \"age\": 30,\n  \"gender\": \"MALE\",\n  \"bloodGroup\": \"O+\",\n  \"address\": \"123 Main Street, City\",\n  \"emergencyContact\": \"9876543211\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "2. Patient Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/patients/login",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "3. Get Patient by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/patients/{{patientId}}"
+                    }
+                },
+                {
+                    "name": "4. Update Patient",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/patients/{{patientId}}",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"9876543210\",\n  \"age\": 31,\n  \"gender\": \"MALE\",\n  \"bloodGroup\": \"O+\",\n  \"address\": \"456 New Street, City\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "5. Get Patient Appointments",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/patients/{{patientId}}/appointments"
+                    }
+                },
+                {
+                    "name": "6. Get Patient Medical Records",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/patients/{{patientId}}/records"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Doctors",
+            "item": [
+                {
+                    "name": "7. Create Doctor",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/doctors",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Dr. Sharma\",\n  \"email\": \"sharma@medicare.com\",\n  \"password\": \"doctor123\",\n  \"phone\": \"9876543212\",\n  \"specialization\": \"Cardiology\",\n  \"qualification\": \"MBBS, MD\",\n  \"experience\": 10,\n  \"consultationFee\": 500,\n  \"availableFrom\": \"09:00\",\n  \"availableTo\": \"17:00\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "8. Doctor Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/doctors/login",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"sharma@medicare.com\",\n  \"password\": \"doctor123\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "9. Get All Doctors",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/doctors"
+                    }
+                },
+                {
+                    "name": "10. Get Doctor by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/doctors/{{doctorId}}"
+                    }
+                },
+                {
+                    "name": "11. Get Available Slots",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/doctors/{{doctorId}}/slots?date=2026-01-20"
+                    }
+                },
+                {
+                    "name": "12. Get Doctor Appointments",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/doctors/{{doctorId}}/appointments"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Appointments",
+            "item": [
+                {
+                    "name": "13. Book Appointment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/patients/{{patientId}}/appointments",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"doctorId\": 1,\n  \"date\": \"2026-01-20\",\n  \"preferredTime\": \"10:30\",\n  \"symptoms\": \"Regular checkup\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "14. Get Appointment by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/appointments/{{appointmentId}}"
+                    }
+                },
+                {
+                    "name": "15. Confirm Appointment",
+                    "request": {
+                        "method": "PATCH",
+                        "url": "{{baseUrl}}/appointments/{{appointmentId}}/confirm"
+                    }
+                },
+                {
+                    "name": "16. Cancel Appointment",
+                    "request": {
+                        "method": "PATCH",
+                        "url": "{{baseUrl}}/appointments/{{appointmentId}}/cancel"
+                    }
+                },
+                {
+                    "name": "17. Complete Appointment",
+                    "request": {
+                        "method": "PATCH",
+                        "url": "{{baseUrl}}/appointments/{{appointmentId}}/complete"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Medical Records",
+            "item": [
+                {
+                    "name": "18. Add Medical Record",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/doctors/{{doctorId}}/records",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"patientId\": 1,\n  \"appointmentId\": 1,\n  \"diagnosis\": \"Mild hypertension\",\n  \"prescription\": \"Amlodipine 5mg\",\n  \"dosageInstructions\": \"Once daily after breakfast\",\n  \"notes\": \"Follow up in 2 weeks\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "19. Get Medical Record",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/records/{{recordId}}"
+                    }
+                },
+                {
+                    "name": "20. View Prescription",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/records/{{recordId}}/prescription/view"
+                    }
+                },
+                {
+                    "name": "21. Download Prescription",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/records/{{recordId}}/prescription/download"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Payments",
+            "item": [
+                {
+                    "name": "22. Create Payment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": "{{baseUrl}}/payments",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"appointmentId\": 1,\n  \"amount\": 500,\n  \"paymentMethod\": \"UPI\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "23. Get Payment by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/payments/{{paymentId}}"
+                    }
+                },
+                {
+                    "name": "24. Get Payment by Appointment",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/payments/appointment/{{appointmentId}}"
+                    }
+                },
+                {
+                    "name": "25. Process Payment",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/payments/{{paymentId}}/process?paymentMethod=UPI"
+                    }
+                },
+                {
+                    "name": "26. Update Payment Status",
+                    "request": {
+                        "method": "PATCH",
+                        "url": "{{baseUrl}}/payments/{{paymentId}}/status?status=PAID"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Admin",
+            "item": [
+                {
+                    "name": "27. Get Dashboard Stats",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/admin/dashboard"
+                    }
+                },
+                {
+                    "name": "28. Get Revenue Report",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/admin/revenue?startDate=2026-01-01&endDate=2026-01-31"
+                    }
+                },
+                {
+                    "name": "29. Get All Patients",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/admin/patients"
+                    }
+                },
+                {
+                    "name": "30. Get All Appointments",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/admin/appointments"
+                    }
+                }
+            ]
+        }
+    ]
+}
