@@ -11,8 +11,6 @@ FROM maven:3.8.5-openjdk-17 AS backend-build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-# Copy built frontend to backend static resources
-COPY --from=frontend-build /app/dist ./src/main/resources/static
 RUN mvn clean package -DskipTests
 
 # Stage 3: Runtime
