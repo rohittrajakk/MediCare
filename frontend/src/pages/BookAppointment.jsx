@@ -456,6 +456,15 @@ function BookAppointment({ user }) {
                                     <div
                                         key={doctor.id}
                                         onClick={() => setSelectedDoctor(doctor)}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-pressed={isSelected}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                setSelectedDoctor(doctor);
+                                            }
+                                        }}
                                         style={{
                                             padding: '1.25rem',
                                             border: `2px solid ${isSelected ? theme.accent : 'var(--gray-200)'}`,
@@ -647,6 +656,15 @@ function BookAppointment({ user }) {
                                             <div
                                                 key={slot}
                                                 onClick={() => setSelectedSlot(slot)}
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-pressed={selectedSlot === slot}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        setSelectedSlot(slot);
+                                                    }
+                                                }}
                                                 className={`slot-modern ${selectedSlot === slot ? 'selected' : ''}`}
                                                 style={{ animationDelay: `${index * 0.05}s` }}
                                             >
