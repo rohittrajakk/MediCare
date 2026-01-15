@@ -16,7 +16,7 @@ COPY --from=frontend-build /app/dist ./src/main/resources/static
 RUN mvn clean package -DskipTests
 
 # Stage 3: Runtime
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=backend-build /app/target/MediCare-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
