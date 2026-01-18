@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "message": "Medication analysis completed",
+  "data": {
+    "aiEnabled": true,
+    "analysis": "**Medication Interaction Alert: Aspirin and Warfarin**\n\n**Known Drug Interactions:**\n\n* Aspirin can increase the risk of bleeding when taken with warfarin, a blood thinner. This is because aspirin also thins the blood.\n\n**Foods to Avoid:**\n\n* Citrus fruits (e.g., orange, grapefruit) - may interact with warfarin and increase bleeding risk\n* Fermented foods (e.g., kimchi, sauerkraut) - may interact with warfarin and increase bleeding risk\n\n**Timing Recommendations:**\n\n* Take aspirin at least 2-3 hours before or after taking warfarin to minimize the risk of interaction.\n* Consult your doctor about specific timing recommendations, as they may vary depending on individual circumstances.\n\n**Remember:** Always consult your doctor or pharmacist before starting any new medications or making changes to your existing treatment plan. They can provide personalized guidance and help you manage potential interactions."
+  },
+  "timestamp": "2026-01-18T16:59:10.770582"
+}

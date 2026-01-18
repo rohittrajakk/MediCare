@@ -22,5 +22,7 @@ public class AppointmentResponse {
     private LocalTime time;
     private AppointmentStatus status;
     private String symptoms;
+    private Boolean isTelehealth;
+    private String telehealthRoomName;
     private LocalDateTime createdAt;
 }

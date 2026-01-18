@@ -1,0 +1,131 @@
+.mobile-consultations {
+    padding: 1rem;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+.mobile-header {
+    margin-bottom: 1.5rem;
+}
+
+.mobile-header h1 {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin-bottom: 1rem;
+}
+
+.view-toggle {
+    display: flex;
+    background-color: #e2e8f0;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+}
+
+.view-toggle button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-toggle button.active {
+    background-color: white;
+    color: #3b82f6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.consultations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.consultation-card {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-top .date {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.doctor-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.doctor-info .avatar {
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.doctor-info h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #1e293b;
+}
+
+.doctor-info p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-view-more,
+.btn-join {
+    flex: 1;
+    padding: 0.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-view-more {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.btn-join {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #94a3b8;
+}

@@ -1,5 +1,26 @@
 # Add 50 Doctors to MediCare
 
+# 1. Login as Admin to get Token
+$adminEmail = "rohitrajak54426@gmail.com"
+$adminPassword = "Rohit@123"
+$loginUrl = "http://localhost:8080/api/auth/login/admin"
+
+Write-Host "Logging in as Admin..." -ForegroundColor Yellow
+$loginBody = @{
+    email = $adminEmail
+    password = $adminPassword
+} | ConvertTo-Json
+
+try {
+    $loginResponse = Invoke-RestMethod -Uri $loginUrl -Method POST -ContentType "application/json" -Body $loginBody
+    $token = $loginResponse.data.accessToken
+    Write-Host "Login Successful! Token received." -ForegroundColor Green
+} catch {
+    Write-Host "Login Failed! Please check if backend is running and credentials are correct." -ForegroundColor Red
+    Write-Host $_.Exception.Message
+    exit
+}
+
 $doctors = @(
     # Cardiology (6 doctors)
     @{name="Dr. Vikram Patel"; specialization="Cardiology"; qualification="MBBS, MD, DM"; experience=18; fee=1500},
@@ -93,7 +114,7 @@ foreach ($doc in $doctors) {
     } | ConvertTo-Json
 
     try {
-        $response = Invoke-RestMethod -Uri $baseUrl -Method POST -ContentType "application/json" -Body $body
+        $response = Invoke-RestMethod -Uri $baseUrl -Method POST -ContentType "application/json" -Body $body -Headers @{ Authorization = "Bearer $token" }
         Write-Host "[$counter/50] Created: $($doc.name) - $($doc.specialization)" -ForegroundColor Green
     } catch {
         Write-Host "[$counter/50] Failed: $($doc.name) - $($_.Exception.Message)" -ForegroundColor Red

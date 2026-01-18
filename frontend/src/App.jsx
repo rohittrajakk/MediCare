@@ -9,6 +9,12 @@ import MyAppointments from './pages/MyAppointments';
 import MedicalRecords from './pages/MedicalRecords';
 import PaymentPage from './pages/PaymentPage';
 import AdminDashboard from './pages/AdminDashboard';
+import PatientLookup from './pages/PatientLookup';
+import PatientDetail from './pages/PatientDetail';
+import TelehealthCall from './pages/TelehealthCall';
+import MobileConsultations from './pages/MobileConsultations';
+import ChatWindow from './pages/ChatWindow';
+import ProfileSettings from './pages/ProfileSettings';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 
@@ -37,6 +43,11 @@ function App() {
         setUserType(null);
         localStorage.removeItem('user');
         localStorage.removeItem('userType');
+    };
+
+    const handleUserUpdate = (updatedUser) => {
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
     };
 
     // Not logged in - show landing page, login, and register
@@ -71,7 +82,13 @@ function App() {
                         <Route path="/my-appointments" element={<MyAppointments user={user} userType={userType} />} />
                         <Route path="/medical-records" element={<MedicalRecords user={user} userType={userType} />} />
                         <Route path="/payments" element={<PaymentPage user={user} />} />
+                        <Route path="/patients" element={<PatientLookup />} />
+                        <Route path="/patients/:patientId" element={<PatientDetail />} />
+                        <Route path="/telehealth/:appointmentId" element={<TelehealthCall />} />
+                        <Route path="/mobile/consultations" element={<MobileConsultations user={user} />} />
+                        <Route path="/chat/:appointmentId" element={<ChatWindow />} />
                         <Route path="/admin" element={<AdminDashboard />} />
+                        <Route path="/profile-settings" element={<ProfileSettings user={user} onUserUpdate={handleUserUpdate} />} />
                         <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                 </div>
@@ -81,3 +98,4 @@ function App() {
 }
 
 export default App;
+

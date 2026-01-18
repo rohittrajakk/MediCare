@@ -22,6 +22,15 @@ const Icons = {
     ),
     Logout: () => (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+    ),
+    Patients: () => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    ),
+    Telemedicine: () => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15.6 11.6L22 7v10l-6.4-4.6v-2.4z"></path><rect x="2" y="5" width="12" height="14" rx="2"></rect></svg>
+    ),
+    Settings: () => (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
     )
 };
 
@@ -30,18 +39,22 @@ function Sidebar({ userType, onLogout }) {
         { path: '/', label: 'Dashboard', Icon: Icons.Dashboard },
         { path: '/book-appointment', label: 'Book Appointment', Icon: Icons.BookAppointment },
         { path: '/my-appointments', label: 'My Appointments', Icon: Icons.MyAppointments },
+        { path: '/mobile/consultations', label: 'Telemedicine', Icon: Icons.Telemedicine },
         { path: '/medical-records', label: 'Medical Records', Icon: Icons.MedicalRecords },
         { path: '/payments', label: 'Payments', Icon: Icons.Payments },
+        { path: '/profile-settings', label: 'Profile Settings', Icon: Icons.Settings },
     ];
 
     const doctorLinks = [
         { path: '/', label: 'Dashboard', Icon: Icons.Dashboard },
         { path: '/my-appointments', label: 'Appointments', Icon: Icons.MyAppointments },
+        { path: '/mobile/consultations', label: 'Telemedicine', Icon: Icons.Telemedicine },
         { path: '/medical-records', label: 'Medical Records', Icon: Icons.MedicalRecords },
     ];
 
     const adminLinks = [
         { path: '/', label: 'Dashboard', Icon: Icons.Dashboard },
+        { path: '/patients', label: 'Patients', Icon: Icons.Patients },
         { path: '/admin', label: 'Admin Panel', Icon: Icons.Admin },
     ];
 
@@ -91,7 +104,7 @@ function Sidebar({ userType, onLogout }) {
                 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
 
                 .sidebar-glass {
-                    width: 280px;
+                    width: 240px;
                     height: 100vh;
                     display: flex;
                     flex-direction: column;
@@ -124,17 +137,18 @@ function Sidebar({ userType, onLogout }) {
                 }
 
                 .logo-icon {
-                    width: 40px;
-                    height: 40px;
+                    width: 42px;
+                    height: 42px;
                     background: linear-gradient(135deg, #6366f1, #a855f7);
-                    border-radius: 12px;
+                    border-radius: 14px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     color: white;
                     font-weight: 800;
-                    font-size: 1.4rem;
-                    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+                    font-size: 1.5rem;
+                    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+                    transform: rotate(-2deg); /* Subtle tiled look */
                 }
 
                 .logo-text {
@@ -163,14 +177,14 @@ function Sidebar({ userType, onLogout }) {
                     display: flex;
                     align-items: center;
                     gap: 1rem;
-                    padding: 0.9rem 1.2rem;
+                    padding: 0.9rem 1.25rem;
                     border-radius: 16px;
-                    color: #64748b;
+                    color: #475569;
                     text-decoration: none;
-                    font-weight: 500;
+                    font-weight: 600;
                     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                     position: relative;
-                    overflow: hidden;
+                    overflow: visible;
                 }
 
                 .nav-link:hover {
