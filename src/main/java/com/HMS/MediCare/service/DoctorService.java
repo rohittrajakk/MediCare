@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class DoctorService {
     private final AppointmentRepository appointmentRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    @CacheEvict(value = {"doctors", "doctorSlots"}, allEntries = true)
     public DoctorResponse createDoctor(DoctorRequest request) {
         if (doctorRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email already registered: " + request.getEmail());
@@ -76,6 +80,7 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "doctors", key = "'all'")
     public List<DoctorResponse> getAllDoctors() {
         return doctorRepository.findAll().stream()
                 .map(this::mapToResponse)
@@ -83,6 +88,7 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "doctors", key = "'active'")
     public List<DoctorResponse> getActiveDoctors() {
         return doctorRepository.findByActiveTrue().stream()
                 .map(this::mapToResponse)
@@ -96,12 +102,14 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "doctors", key = "#specialization")
     public List<DoctorResponse> getDoctorsBySpecialization(String specialization) {
         return doctorRepository.findBySpecializationContainingIgnoreCase(specialization).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
+    @CacheEvict(value = {"doctors", "doctorSlots"}, allEntries = true)
     public DoctorResponse updateDoctor(Long id, DoctorRequest request) {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id));
@@ -128,6 +136,7 @@ public class DoctorService {
         return mapToResponse(updatedDoctor);
     }
 
+    @CacheEvict(value = {"doctors", "doctorSlots"}, allEntries = true)
     public void deleteDoctor(Long id) {
         if (!doctorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Doctor", "id", id);
@@ -136,6 +145,7 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "doctorSlots", key = "#doctorId + '_' + #date")
     public AvailableSlotsResponse getAvailableSlots(Long doctorId, LocalDate date) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", doctorId));

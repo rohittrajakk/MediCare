@@ -12,7 +12,13 @@ function StatusBadge({ status }) {
             case 'cancelled':
             case 'failed':
             case 'refunded':
+            case 'critical':
+            case 'high':
                 return 'badge-cancelled';
+            case 'medium':
+                return 'badge-pending';
+            case 'low':
+                return 'badge-confirmed';
             default:
                 return 'badge-pending';
         }

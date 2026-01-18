@@ -34,6 +34,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     );
     
     List<Appointment> findByStatus(AppointmentStatus status);
+
+    List<Appointment> findByAppointmentDate(LocalDate date);
     
     @Query("SELECT COUNT(a) FROM Appointment a WHERE a.status = :status")
     long countByStatus(@Param("status") AppointmentStatus status);

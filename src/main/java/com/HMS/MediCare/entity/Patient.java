@@ -58,6 +58,28 @@ public class Patient {
     @Column(length = 15)
     private String emergencyContact;
 
+    // Risk level: LOW, MODERATE, HIGH
+    @Column(name = "risk_level", length = 20)
+    private String riskLevel;
+
+    // Primary Care Physician
+    @Column(name = "primary_physician", length = 100)
+    private String primaryPhysician;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "acuity_level", length = 20)
+    private com.HMS.MediCare.enums.AcuityLevel acuityLevel;
+
+    @Column(name = "alert_reason", columnDefinition = "TEXT")
+    private String alertReason;
+
+    // Insurance Information
+    @Column(name = "insurance_provider", length = 100)
+    private String insuranceProvider;
+
+    @Column(name = "insurance_id", length = 50)
+    private String insuranceId;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -73,4 +95,12 @@ public class Patient {
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Payment> payments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PatientVitals> vitals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PatientMedicalHistory> medicalHistory = new ArrayList<>();
 }

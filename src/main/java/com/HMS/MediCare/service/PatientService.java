@@ -2,19 +2,25 @@ package com.HMS.MediCare.service;
 
 import com.HMS.MediCare.dto.request.LoginRequest;
 import com.HMS.MediCare.dto.request.PatientRegistrationRequest;
+import com.HMS.MediCare.dto.request.PatientSearchRequest;
 import com.HMS.MediCare.dto.response.PatientResponse;
 import com.HMS.MediCare.entity.Patient;
 import com.HMS.MediCare.exception.BadRequestException;
 import com.HMS.MediCare.exception.DuplicateResourceException;
 import com.HMS.MediCare.exception.ResourceNotFoundException;
 import com.HMS.MediCare.repository.PatientRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,6 +84,95 @@ public class PatientService {
                 .map(this::mapToResponse);
     }
 
+    // Quick search for auto-suggestions (searches across name, email, phone, ID)
+    @Transactional(readOnly = true)
+    public List<PatientResponse> quickSearch(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return patientRepository.findAll().stream()
+                    .limit(10)
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
+        return patientRepository.quickSearch(query.trim()).stream()
+                .limit(10)
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    // Advanced search with multiple filters
+    @Transactional(readOnly = true)
+    public Page<PatientResponse> searchPatients(PatientSearchRequest request, Pageable pageable) {
+        Specification<Patient> spec = buildSearchSpecification(request);
+        return patientRepository.findAll(spec, pageable).map(this::mapToResponse);
+    }
+
+    private Specification<Patient> buildSearchSpecification(PatientSearchRequest request) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // General query search (across multiple fields)
+            if (request.getQuery() != null && !request.getQuery().trim().isEmpty()) {
+                String searchTerm = "%" + request.getQuery().trim().toLowerCase() + "%";
+                Predicate namePredicate = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("name")), searchTerm);
+                Predicate emailPredicate = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("email")), searchTerm);
+                Predicate phonePredicate = criteriaBuilder.like(root.get("phone"), searchTerm);
+                predicates.add(criteriaBuilder.or(namePredicate, emailPredicate, phonePredicate));
+            }
+
+            // Name filter
+            if (request.getName() != null && !request.getName().trim().isEmpty()) {
+                predicates.add(criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("name")),
+                        "%" + request.getName().trim().toLowerCase() + "%"));
+            }
+
+            // Email filter
+            if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+                predicates.add(criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("email")),
+                        "%" + request.getEmail().trim().toLowerCase() + "%"));
+            }
+
+            // Phone filter
+            if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("phone"),
+                        "%" + request.getPhone().trim() + "%"));
+            }
+
+            // Age range filter
+            if (request.getMinAge() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("age"), request.getMinAge()));
+            }
+            if (request.getMaxAge() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("age"), request.getMaxAge()));
+            }
+
+            // Gender filter
+            if (request.getGender() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("gender"), request.getGender()));
+            }
+
+            // Blood group filter
+            if (request.getBloodGroup() != null && !request.getBloodGroup().trim().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("bloodGroup"), request.getBloodGroup().trim()));
+            }
+
+            // Date range filters
+            if (request.getCreatedAfter() != null) {
+                LocalDateTime startOfDay = request.getCreatedAfter().atStartOfDay();
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startOfDay));
+            }
+            if (request.getCreatedBefore() != null) {
+                LocalDateTime endOfDay = request.getCreatedBefore().atTime(LocalTime.MAX);
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endOfDay));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
     public PatientResponse updatePatient(Long id, PatientRegistrationRequest request) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", id));
@@ -111,6 +206,14 @@ public class PatientService {
         patientRepository.deleteById(id);
     }
 
+    public PatientResponse updateAcuity(Long id, com.HMS.MediCare.enums.AcuityLevel acuityLevel, String alertReason) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", id));
+        patient.setAcuityLevel(acuityLevel);
+        patient.setAlertReason(alertReason);
+        return mapToResponse(patientRepository.save(patient));
+    }
+
     public Patient getPatientEntityById(Long id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", id));
@@ -127,7 +230,14 @@ public class PatientService {
                 .gender(patient.getGender())
                 .bloodGroup(patient.getBloodGroup())
                 .emergencyContact(patient.getEmergencyContact())
+                .riskLevel(patient.getRiskLevel())
+                .primaryPhysician(patient.getPrimaryPhysician())
+                .insuranceProvider(patient.getInsuranceProvider())
+                .insuranceId(patient.getInsuranceId())
+                .acuityLevel(patient.getAcuityLevel())
+                .alertReason(patient.getAlertReason())
                 .createdAt(patient.getCreatedAt())
                 .build();
     }
 }
+

@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "message": "Health tips generated",
+  "data": {
+    "aiEnabled": true,
+    "tips": "Hello! I'm here to support your heart health journey. As a sedentary individual with heart disease, here are three to five actionable tips tailored just for you:\n\n1. **Start small: Take a 10-minute walk**: Begin with short, manageable walks each day to get your blood flowing and your heart rate up. Gradually increase duration and frequency over time.\n2. **Incorporate strength training**: Gentle exercises like yoga or bodyweight exercises can help improve cardiovascular health without putting excessive strain on the heart. Aim for 2-3 sessions per week.\n3. **Make every step count: Take the stairs**: Whenever possible, opt for stair climbing instead of elevators. This will not only get your heart rate up but also strengthen your legs and core muscles.\n4. (Optional) Consider a low-impact aerobic activity: Engage in activities like swimming, cycling, or using an elliptical machine to get your heart rate up without putting excessive strain on the heart.\n5. **Schedule physical therapy sessions**: Regular sessions with a physical therapist can help you create a personalized exercise plan and monitor progress, ensuring safe and effective exercise habits.\n\nRemember, every step counts! Start small, be consistent, and celebrate your progress along the way.\n\n**Important:** Consult your healthcare provider before starting any new exercise program. They will provide guidance on intensity, duration, and frequency tailored to your specific needs.\n\nYou got this!"
+  },
+  "timestamp": "2026-01-18T16:58:48.2238312"
+}

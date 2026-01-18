@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { patientApi, doctorApi, appointmentApi } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
+import RiskBadge from '../components/ai/RiskBadge';
 import Modal from '../components/Modal';
 import Loading from '../components/Loading';
 
 function MyAppointments({ user, userType }) {
+    const navigate = useNavigate();
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -127,6 +130,7 @@ function MyAppointments({ user, userType }) {
                                     <th>Date</th>
                                     <th>Time</th>
                                     <th>Status</th>
+                                    {userType === 'doctor' && <th>Risk</th>}
                                     <th>Symptoms</th>
                                     <th>Actions</th>
                                 </tr>
@@ -188,6 +192,15 @@ function MyAppointments({ user, userType }) {
                                         <td>
                                             <StatusBadge status={apt.status} />
                                         </td>
+                                        {userType === 'doctor' && (
+                                            <td>
+                                                <RiskBadge 
+                                                    appointmentId={apt.id}
+                                                    initialRiskScore={apt.noShowRiskScore}
+                                                    showDetails={true}
+                                                />
+                                            </td>
+                                        )}
                                         <td style={{ maxWidth: '150px' }}>
                                             <p style={{
                                                 fontSize: '0.875rem',
@@ -241,6 +254,20 @@ function MyAppointments({ user, userType }) {
                                                         }}
                                                     >
                                                         Cancel
+                                                    </button>
+                                                )}
+                                                {apt.status === 'CONFIRMED' && (
+                                                    <button
+                                                        className="btn btn-sm"
+                                                        onClick={() => navigate(`/telehealth/${apt.id}`)}
+                                                        style={{
+                                                            background: '#e0f2fe',
+                                                            color: '#0369a1',
+                                                            border: 'none',
+                                                            fontWeight: 600
+                                                        }}
+                                                    >
+                                                        Join Call
                                                     </button>
                                                 )}
                                             </div>

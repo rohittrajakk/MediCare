@@ -1,6 +1,7 @@
 package com.HMS.MediCare.entity;
 
 import com.HMS.MediCare.enums.AppointmentStatus;
+import com.HMS.MediCare.enums.ConfirmationStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -49,6 +50,41 @@ public class Appointment {
     @Column(columnDefinition = "TEXT")
     private String symptoms;
 
+    @Column(name = "is_telehealth")
+    @Builder.Default
+    private Boolean isTelehealth = false;
+
+    @Column(name = "telehealth_room_name")
+    private String telehealthRoomName;
+
+    // ===== No-Show Prevention Fields =====
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "confirmation_status", length = 20)
+    @Builder.Default
+    private ConfirmationStatus confirmationStatus = ConfirmationStatus.PENDING;
+
+    @Column(name = "no_show_risk_score")
+    private Double noShowRiskScore; // 0.0 to 1.0 probability
+
+    @Column(name = "reminder_48h_sent_at")
+    private LocalDateTime reminder48hSentAt;
+
+    @Column(name = "reminder_24h_sent_at")
+    private LocalDateTime reminder24hSentAt;
+
+    @Column(name = "reminder_2h_sent_at")
+    private LocalDateTime reminder2hSentAt;
+
+    @Column(name = "confirmed_at")
+    private LocalDateTime confirmedAt;
+
+    @Column(name = "is_no_show")
+    @Builder.Default
+    private Boolean isNoShow = false;
+
+    // ===== End No-Show Prevention Fields =====
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -59,3 +95,4 @@ public class Appointment {
     @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
 }
+

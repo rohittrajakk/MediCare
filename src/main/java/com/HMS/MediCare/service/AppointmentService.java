@@ -190,6 +190,8 @@ public class AppointmentService {
                 .time(appointment.getTimeSlot())
                 .status(appointment.getStatus())
                 .symptoms(appointment.getSymptoms())
+                .isTelehealth(appointment.getIsTelehealth())
+                .telehealthRoomName(appointment.getTelehealthRoomName())
                 .createdAt(appointment.getCreatedAt())
                 .build();
     }

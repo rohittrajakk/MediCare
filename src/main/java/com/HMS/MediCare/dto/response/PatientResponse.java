@@ -19,5 +19,12 @@ public class PatientResponse {
     private Gender gender;
     private String bloodGroup;
     private String emergencyContact;
+    private String riskLevel;
+    private String primaryPhysician;
+    private String insuranceProvider;
+    private String insuranceId;
+    private com.HMS.MediCare.enums.AcuityLevel acuityLevel;
+    private String alertReason;
     private LocalDateTime createdAt;
 }
+

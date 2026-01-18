@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJ0eXBlIjoiYWNjZXNzIiwidXNlcklkIjowLCJzdWIiOiJyb2hpdHJhamFrNTQ0MjZAZ21haWwuY29tIiwiaWF0IjoxNzY4NzM1NjcwLCJleHAiOjE3Njg3MzY1NzB9.4knnsNZpuFcOuA0HWYzejLaNK6QPYQDNCUA6DjKb7K0",
+    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJ0eXBlIjoicmVmcmVzaCIsInVzZXJJZCI6MCwic3ViIjoicm9oaXRyYWphazU0NDI2QGdtYWlsLmNvbSIsImlhdCI6MTc2ODczNTY3MCwiZXhwIjoxNzY5MzQwNDcwfQ.pL4i7w_jp7I6EoPQc10GTg9iH_Hp_MCen2K7SwgokUo",
+    "tokenType": "Bearer",
+    "expiresIn": 900,
+    "id": 0,
+    "email": "rohitrajak54426@gmail.com",
+    "name": "Administrator",
+    "role": "ADMIN"
+  },
+  "timestamp": "2026-01-18T16:57:50.7123903"
+}
