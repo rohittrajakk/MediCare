@@ -28,6 +28,8 @@ public class PatientVitalsResponse {
     private Integer oxygenSaturation;
     private BigDecimal bloodGlucose;
     private Integer respiratoryRate;
+    private BigDecimal hemoglobin;
+    private String dataSource;
 
     // BMI calculated from height/weight
     private BigDecimal bmi;

@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -15,8 +16,16 @@ import TelehealthCall from './pages/TelehealthCall';
 import MobileConsultations from './pages/MobileConsultations';
 import ChatWindow from './pages/ChatWindow';
 import ProfileSettings from './pages/ProfileSettings';
+import VitalsDashboard from './pages/VitalsDashboard';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
+
+// Page transition variants
+const pageVariants = {
+    initial: { opacity: 0, y: 10 },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } },
+    exit: { opacity: 0, y: -10, transition: { duration: 0.2 } }
+};
 
 function App() {
     const [user, setUser] = useState(null);
@@ -89,6 +98,7 @@ function App() {
                         <Route path="/chat/:appointmentId" element={<ChatWindow />} />
                         <Route path="/admin" element={<AdminDashboard />} />
                         <Route path="/profile-settings" element={<ProfileSettings user={user} onUserUpdate={handleUserUpdate} />} />
+                        <Route path="/vitals" element={<VitalsDashboard user={user} />} />
                         <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                 </div>

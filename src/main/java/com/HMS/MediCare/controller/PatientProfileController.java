@@ -170,15 +170,7 @@ public class PatientProfileController {
         return ResponseEntity.ok(ApiResponse.success(surgeries));
     }
 
-    @PostMapping("/medical-history")
-    @Operation(summary = "Add medical history entry")
-    public ResponseEntity<ApiResponse<PatientMedicalHistoryResponse>> addMedicalHistory(
-            @PathVariable Long patientId,
-            @Valid @RequestBody PatientMedicalHistoryRequest request) {
-        PatientMedicalHistoryResponse history = historyService.addHistory(patientId, request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Medical history added successfully", history));
-    }
+
 
     @PutMapping("/medical-history/{historyId}")
     @Operation(summary = "Update medical history entry")

@@ -214,6 +214,28 @@ public class PatientService {
         return mapToResponse(patientRepository.save(patient));
     }
 
+    public void addMedicalHistory(Long patientId, com.HMS.MediCare.dto.request.PatientMedicalHistoryRequest request) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", patientId));
+
+        com.HMS.MediCare.entity.PatientMedicalHistory history = com.HMS.MediCare.entity.PatientMedicalHistory.builder()
+                .patient(patient)
+                .type(request.getType())
+                .name(request.getName())
+                .severity(request.getSeverity())
+                .status(request.getStatus())
+                .notes(request.getNotes())
+                .dosage(request.getDosage())
+                .frequency(request.getFrequency())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .createdBy(request.getCreatedBy())
+                .build();
+        
+        patient.getMedicalHistory().add(history);
+        patientRepository.save(patient);
+    }
+
     public Patient getPatientEntityById(Long id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", id));

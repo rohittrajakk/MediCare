@@ -27,6 +27,13 @@ public class MedicalRecordController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PostMapping
+    @Operation(summary = "Create medical record", description = "Create a new medical record (e.g. uploaded by patient)")
+    public ResponseEntity<ApiResponse<MedicalRecordResponse>> createRecord(@RequestBody com.HMS.MediCare.dto.request.MedicalRecordRequest request) {
+        MedicalRecordResponse response = medicalRecordService.createPatientRecord(request);
+        return ResponseEntity.ok(ApiResponse.success("Medical record created successfully", response));
+    }
+
     @GetMapping("/{id}/prescription/download")
     @Operation(summary = "Download prescription as text file")
     public ResponseEntity<byte[]> downloadPrescription(@PathVariable Long id) {

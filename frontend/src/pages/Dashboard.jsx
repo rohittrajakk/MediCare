@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { patientApi } from '../services/api';
 import UnifiedHealthAssistant from '../components/ai/UnifiedHealthAssistant';
+import { AnimatedNumber, Floating3D } from '../components/ui';
 
 function Dashboard({ user }) {
     const [stats, setStats] = useState({
@@ -108,8 +110,38 @@ function Dashboard({ user }) {
                     </div>
                 </div>
             )}
-            {/* Unified Hero Section */}
-            <div className="dashboard-hero">
+            {/* Unified Hero Section with Floating 3D Elements */}
+            <motion.div 
+                className="dashboard-hero"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+            >
+                {/* Floating 3D Elements */}
+                <Floating3D 
+                    src="/assets/heart-3d-transparent.png" 
+                    size="60px"
+                    position={{ top: '10%', right: '5%' }}
+                    duration={4}
+                    delay={0}
+                    zIndex={1}
+                />
+                <Floating3D 
+                    src="/assets/pills-3d.png" 
+                    size="45px"
+                    position={{ bottom: '15%', right: '15%' }}
+                    duration={5}
+                    delay={0.5}
+                    zIndex={1}
+                />
+                <Floating3D 
+                    src="/assets/dna-transparent.png" 
+                    size="50px"
+                    position={{ top: '20%', right: '25%' }}
+                    duration={6}
+                    delay={1}
+                    zIndex={1}
+                />
                 <div className="hero-content">
                     <div className="hero-header">
                         <span className="greeting-badge">
@@ -156,47 +188,71 @@ function Dashboard({ user }) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Stats Cards - Evidence-Based Priority */}
-            <div className="stats-grid">
-                <div className="stat-card blue">
+            {/* Stats Cards - Bento Grid with Staggered Animation */}
+            <motion.div 
+                className="stats-grid"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    hidden: {},
+                    visible: { transition: { staggerChildren: 0.1 } }
+                }}
+            >
+                <motion.div 
+                    className="stat-card blue card-lift"
+                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                    whileHover={{ scale: 1.02 }}
+                >
                     <div className="stat-icon-wrapper">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
                     <div>
-                        <span className="stat-number">{stats.totalAppointments}</span>
+                        <AnimatedNumber value={stats.totalAppointments} className="stat-number" />
                         <span className="stat-label">Total Appointments</span>
                     </div>
-                </div>
-                <div className="stat-card orange">
+                </motion.div>
+                <motion.div 
+                    className="stat-card orange card-lift"
+                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                    whileHover={{ scale: 1.02 }}
+                >
                     <div className="stat-icon-wrapper">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </div>
                     <div>
-                        <span className="stat-number">{stats.upcomingAppointments}</span>
+                        <AnimatedNumber value={stats.upcomingAppointments} className="stat-number" />
                         <span className="stat-label">Upcoming</span>
                     </div>
-                </div>
-                <div className="stat-card green">
+                </motion.div>
+                <motion.div 
+                    className="stat-card green card-lift"
+                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                    whileHover={{ scale: 1.02 }}
+                >
                     <div className="stat-icon-wrapper">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
                     <div>
-                        <span className="stat-number">{stats.completedAppointments}</span>
+                        <AnimatedNumber value={stats.completedAppointments} className="stat-number" />
                         <span className="stat-label">Completed</span>
                     </div>
-                </div>
-                <div className="stat-card pink">
+                </motion.div>
+                <motion.div 
+                    className="stat-card pink card-lift"
+                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                    whileHover={{ scale: 1.02 }}
+                >
                     <div className="stat-icon-wrapper">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     </div>
                     <div>
-                        <span className="stat-number">{stats.medicalRecords}</span>
+                        <AnimatedNumber value={stats.medicalRecords} className="stat-number" />
                         <span className="stat-label">Medical Records</span>
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
             {/* Unified AI Care Hub */}
             <div className="care-hub">

@@ -29,13 +29,22 @@ public class MedicalRecordService {
 
     public MedicalRecordResponse createRecord(Long doctorId, MedicalRecordRequest request, Doctor doctor) {
         Patient patient = patientService.getPatientEntityById(request.getPatientId());
-        Appointment appointment = appointmentService.getAppointmentEntityById(request.getAppointmentId());
+        
+        Appointment appointment = null;
+        if (request.getAppointmentId() != null) {
+            appointment = appointmentService.getAppointmentEntityById(request.getAppointmentId());
+        }
 
+        // If doctor is provided (via controller), use it. Otherwise, doctor remains null (external record)
+        
         MedicalRecord record = MedicalRecord.builder()
                 .patient(patient)
-                .doctor(doctor)
-                .appointment(appointment)
+                .doctor(doctor) // Can be null
+                .appointment(appointment) // Can be null
+                .consultantName(request.getConsultantName())
+                .visitDate(request.getVisitDate())
                 .diagnosis(request.getDiagnosis())
+                .symptoms(request.getSymptoms())
                 .prescription(request.getPrescription())
                 .dosageInstructions(request.getDosageInstructions())
                 .notes(request.getNotes())
@@ -44,10 +53,17 @@ public class MedicalRecordService {
 
         MedicalRecord savedRecord = medicalRecordRepository.save(record);
 
-        // Mark appointment as completed
-        appointment.setStatus(AppointmentStatus.COMPLETED);
+        // Mark appointment as completed if linked
+        if (appointment != null) {
+            appointment.setStatus(AppointmentStatus.COMPLETED);
+        }
 
         return mapToResponse(savedRecord);
+    }
+    
+    // Default create method for patient-uploaded records where no internal doctor exists
+    public MedicalRecordResponse createPatientRecord(MedicalRecordRequest request) {
+        return createRecord(null, request, null);
     }
 
     @Transactional(readOnly = true)
@@ -98,10 +114,20 @@ public class MedicalRecordService {
         content.append("           MEDICARE PRESCRIPTION           \n");
         content.append("===========================================\n\n");
         content.append("Patient: ").append(record.getPatient().getName()).append("\n");
-        content.append("Doctor: Dr. ").append(record.getDoctor().getName()).append("\n");
-        content.append("Specialization: ").append(record.getDoctor().getSpecialization()).append("\n");
-        content.append("Date: ").append(record.getRecordDate()).append("\n\n");
+        
+        if (record.getDoctor() != null) {
+            content.append("Doctor: Dr. ").append(record.getDoctor().getName()).append("\n");
+            content.append("Specialization: ").append(record.getDoctor().getSpecialization()).append("\n");
+        } else if (record.getConsultantName() != null) {
+            content.append("Consultant:Dr. ").append(record.getConsultantName()).append("\n");
+        }
+        
+        if (record.getVisitDate() != null) {
+             content.append("Visit Date: ").append(record.getVisitDate()).append("\n");
+        }
+        content.append("Date Recorded: ").append(record.getRecordDate()).append("\n\n");
         content.append("-------------------------------------------\n");
+        content.append("SYMPTOMS:\n").append(record.getSymptoms() != null ? record.getSymptoms() : "N/A").append("\n\n");
         content.append("DIAGNOSIS:\n").append(record.getDiagnosis()).append("\n\n");
         content.append("PRESCRIPTION:\n").append(record.getPrescription()).append("\n\n");
         content.append("DOSAGE INSTRUCTIONS:\n").append(record.getDosageInstructions()).append("\n\n");
@@ -120,10 +146,13 @@ public class MedicalRecordService {
                 .id(record.getId())
                 .patientId(record.getPatient().getId())
                 .patientName(record.getPatient().getName())
-                .doctorId(record.getDoctor().getId())
-                .doctorName(record.getDoctor().getName())
+                .doctorId(record.getDoctor() != null ? record.getDoctor().getId() : null)
+                .doctorName(record.getDoctor() != null ? record.getDoctor().getName() : null)
+                .consultantName(record.getConsultantName())
+                .visitDate(record.getVisitDate())
                 .appointmentId(record.getAppointment() != null ? record.getAppointment().getId() : null)
                 .diagnosis(record.getDiagnosis())
+                .symptoms(record.getSymptoms())
                 .prescription(record.getPrescription())
                 .dosageInstructions(record.getDosageInstructions())
                 .notes(record.getNotes())
@@ -131,4 +160,6 @@ public class MedicalRecordService {
                 .attachmentPath(record.getAttachmentPath())
                 .build();
     }
+
+
 }

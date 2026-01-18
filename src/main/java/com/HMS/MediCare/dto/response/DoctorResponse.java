@@ -13,6 +13,7 @@ import java.time.LocalTime;
 public class DoctorResponse {
     private Long id;
     private String name;
+    private String doctorUniqueId;
     private String email;
     private String phone;
     private String specialization;

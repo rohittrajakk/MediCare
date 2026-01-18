@@ -24,8 +24,14 @@ public class MedicalRecord {
     private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_id", nullable = false)
+    @JoinColumn(name = "doctor_id") // Nullable for external records
     private Doctor doctor;
+
+    @Column(name = "consultant_name")
+    private String consultantName;
+
+    @Column(name = "visit_date")
+    private java.time.LocalDate visitDate;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointment_id")
@@ -33,6 +39,9 @@ public class MedicalRecord {
 
     @Column(columnDefinition = "TEXT")
     private String diagnosis;
+
+    @Column(columnDefinition = "TEXT")
+    private String symptoms;
 
     @Column(columnDefinition = "TEXT")
     private String prescription;

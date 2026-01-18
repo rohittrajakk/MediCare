@@ -62,6 +62,7 @@ export const appointmentApi = {
 // Medical Record APIs
 export const recordApi = {
     getById: (id) => api.get(`/records/${id}`),
+    create: (data) => api.post('/records', data),
     downloadPrescription: (id) => api.get(`/records/${id}/prescription/download`, { responseType: 'blob' }),
     viewPrescription: (id) => api.get(`/records/${id}/prescription/view`),
 };
@@ -98,7 +99,8 @@ export const patientProfileApi = {
     getVitals: (patientId) => api.get(`/patients/${patientId}/vitals`),
     getLatestVitals: (patientId) => api.get(`/patients/${patientId}/vitals/latest`),
     getRecentVitals: (patientId, count = 5) => api.get(`/patients/${patientId}/vitals/recent?count=${count}`),
-    recordVitals: (patientId, data) => api.post(`/patients/${patientId}/vitals`, data),
+    // Corrected path to match VitalsController.addVitals
+    recordVitals: (patientId, data) => api.post(`/vitals/add?patientId=${patientId}`, data),
     deleteVitals: (patientId, vitalsId) => api.delete(`/patients/${patientId}/vitals/${vitalsId}`),
 
     // Medical History
@@ -107,6 +109,7 @@ export const patientProfileApi = {
     getConditions: (patientId) => api.get(`/patients/${patientId}/conditions`),
     getMedications: (patientId) => api.get(`/patients/${patientId}/medications`),
     getSurgeries: (patientId) => api.get(`/patients/${patientId}/surgeries`),
+    // Correctly matches the new endpoint
     addMedicalHistory: (patientId, data) => api.post(`/patients/${patientId}/medical-history`, data),
     updateMedicalHistory: (patientId, historyId, data) => api.put(`/patients/${patientId}/medical-history/${historyId}`, data),
     deleteMedicalHistory: (patientId, historyId) => api.delete(`/patients/${patientId}/medical-history/${historyId}`),
@@ -156,6 +159,9 @@ export const vitalsApi = {
     recordMultipleVitals: (patientId, vitals) => 
         api.post(`/vitals/record-multiple?patientId=${patientId}`, vitals),
     
+    // Add comprehensive manual vitals record
+    addManual: (patientId, data) => api.post(`/vitals/add?patientId=${patientId}`, data),
+    
     // Set custom threshold for a patient
     setThreshold: (patientId, vitalType, minValue, maxValue, criticalMin, criticalMax) =>
         api.post('/vitals/threshold', null, { 
@@ -164,6 +170,10 @@ export const vitalsApi = {
     
     // Get patient alerts
     getPatientAlerts: (patientId) => api.get(`/vitals/patient/${patientId}/alerts`),
+    
+    // Get 3D Dashboard Data
+    getDashboard: (patientId) => api.get(`/vitals/dashboard/${patientId}`),
+
     getAlertHistory: (patientId, page = 0, size = 20) => 
         api.get(`/vitals/patient/${patientId}/alerts/history?page=${page}&size=${size}`),
     

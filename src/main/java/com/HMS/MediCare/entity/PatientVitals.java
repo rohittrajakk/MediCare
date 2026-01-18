@@ -63,6 +63,14 @@ public class PatientVitals {
     @Column(name = "respiratory_rate")
     private Integer respiratoryRate;
 
+    // Hemoglobin in g/dL
+    @Column(precision = 4, scale = 1)
+    private BigDecimal hemoglobin;
+
+    // Data Source (MANUAL, APPLE_HEALTH, etc.)
+    @Column(name = "data_source")
+    private String dataSource; // e.g., "MANUAL", "APPLE_HEALTH", "GOOGLE_FIT"
+
     @Column(columnDefinition = "TEXT")
     private String notes;
 

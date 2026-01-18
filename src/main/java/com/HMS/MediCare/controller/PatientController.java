@@ -123,4 +123,13 @@ public class PatientController {
                 patientId, PageRequest.of(page, size, Sort.by("recordDate").descending()));
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    @PostMapping("/{patientId}/medical-history")
+    @Operation(summary = "Add medical history (allergy, condition, etc.)")
+    public ResponseEntity<ApiResponse<Void>> addMedicalHistory(
+            @PathVariable Long patientId,
+            @Valid @RequestBody com.HMS.MediCare.dto.request.PatientMedicalHistoryRequest request) {
+        patientService.addMedicalHistory(patientId, request);
+        return ResponseEntity.ok(ApiResponse.success("Medical history added successfully", null));
+    }
 }

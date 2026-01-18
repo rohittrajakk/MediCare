@@ -29,6 +29,9 @@ public class Doctor {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(name = "doctor_unique_id", unique = true, length = 4)
+    private String doctorUniqueId;
+
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
     @Column(nullable = false, unique = true, length = 100)

@@ -29,6 +29,7 @@ public class PatientVitalsService {
     private final PatientVitalsRepository vitalsRepository;
     private final PatientRepository patientRepository;
     private final AppointmentRepository appointmentRepository;
+    private final com.HMS.MediCare.repository.MedicalRecordRepository medicalRecordRepository;
 
     // Record new vitals
     public PatientVitalsResponse recordVitals(Long patientId, PatientVitalsRequest request) {
@@ -52,6 +53,8 @@ public class PatientVitalsService {
                 .oxygenSaturation(request.getOxygenSaturation())
                 .bloodGlucose(request.getBloodGlucose())
                 .respiratoryRate(request.getRespiratoryRate())
+                .hemoglobin(request.getHemoglobin())
+                .dataSource(request.getDataSource())
                 .notes(request.getNotes())
                 .recordedBy(request.getRecordedBy())
                 .build();
@@ -99,6 +102,102 @@ public class PatientVitalsService {
         vitalsRepository.deleteById(vitalsId);
     }
 
+    // --- Dashboard Aggregation Logic ---
+
+    public com.HMS.MediCare.dto.response.VitalsDashboardResponse getPatientHealthDashboard(Long patientId) {
+        // 1. Fetch recent vitals (limit 50 to ensure we capture spread out updates)
+        List<PatientVitals> recentVitals = vitalsRepository.findRecentVitals(patientId, PageRequest.of(0, 50));
+        
+        // 2. Fetch medical records for conditions
+        List<com.HMS.MediCare.entity.MedicalRecord> records = medicalRecordRepository.findByPatientId(patientId);
+        List<String> conditions = records.stream()
+                .map(com.HMS.MediCare.entity.MedicalRecord::getDiagnosis)
+                .filter(d -> d != null && !d.isEmpty())
+                .distinct()
+                .limit(5)
+                .collect(Collectors.toList());
+
+        // 3. Aggregate Metrics
+        var builder = com.HMS.MediCare.dto.response.VitalsDashboardResponse.builder();
+        builder.activeConditions(conditions);
+
+        // Helper to find latest non-null
+        builder.weight(findLatestMetric(recentVitals, v -> v.getWeight() != null, v -> v.getWeight().toString(), "kg"));
+        builder.height(findLatestMetric(recentVitals, v -> v.getHeight() != null, v -> v.getHeight().toString(), "cm"));
+        builder.temperature(findLatestMetric(recentVitals, v -> v.getTemperature() != null, v -> v.getTemperature().toString(), "°F"));
+        builder.heartRate(findLatestMetric(recentVitals, v -> v.getHeartRate() != null, v -> v.getHeartRate().toString(), "bpm"));
+        builder.oxygenSaturation(findLatestMetric(recentVitals, v -> v.getOxygenSaturation() != null, v -> v.getOxygenSaturation().toString(), "%"));
+        builder.respiratoryRate(findLatestMetric(recentVitals, v -> v.getRespiratoryRate() != null, v -> v.getRespiratoryRate().toString(), "bpm"));
+        builder.bloodGlucose(findLatestMetric(recentVitals, v -> v.getBloodGlucose() != null, v -> v.getBloodGlucose().toString(), "mg/dL"));
+        builder.hemoglobin(findLatestMetric(recentVitals, v -> v.getHemoglobin() != null, v -> v.getHemoglobin().toString(), "g/dL"));
+
+        // BP is special (two fields)
+        PatientVitals latestBP = recentVitals.stream().filter(v -> v.getSystolicBP() != null && v.getDiastolicBP() != null).findFirst().orElse(null);
+        if (latestBP != null) {
+            String val = latestBP.getSystolicBP() + "/" + latestBP.getDiastolicBP();
+            builder.bloodPressure(createMetric(val, "mmHg", checkBPStatus(latestBP.getSystolicBP(), latestBP.getDiastolicBP()), latestBP));
+        }
+
+        // BMI Calculation
+        try {
+             var latestWeight = recentVitals.stream().filter(v -> v.getWeight() != null).findFirst().orElse(null);
+             var latestHeight = recentVitals.stream().filter(v -> v.getHeight() != null).findFirst().orElse(null);
+             if (latestWeight != null && latestHeight != null) {
+                 double w = latestWeight.getWeight().doubleValue();
+                 double h = latestHeight.getHeight().doubleValue() / 100.0; // cm to m
+                 if (h > 0) {
+                     double bmi = w / (h * h);
+                     String bmiStr = String.format("%.1f", bmi);
+                     String status = bmi < 18.5 ? "UNDERWEIGHT" : bmi < 25 ? "NORMAL" : bmi < 30 ? "OVERWEIGHT" : "OBESE";
+                     // Use date from the most recent of the two
+                     PatientVitals source = latestWeight.getRecordedAt().isAfter(latestHeight.getRecordedAt()) ? latestWeight : latestHeight;
+                     builder.bmi(createMetric(bmiStr, "", status, source));
+                 }
+             }
+        } catch (Exception ignored) {}
+
+        return builder.build();
+    }
+
+    private com.HMS.MediCare.dto.response.VitalsDashboardResponse.VitalMetric findLatestMetric(
+            List<PatientVitals> vitals, 
+            java.util.function.Predicate<PatientVitals> predicate, 
+            java.util.function.Function<PatientVitals, String> valueExtractor, 
+            String unit) {
+        
+        return vitals.stream().filter(predicate).findFirst()
+                .map(v -> createMetric(valueExtractor.apply(v), unit, "NORMAL", v)) // Status logic can be improved
+                .orElse(null);
+    }
+
+    private com.HMS.MediCare.dto.response.VitalsDashboardResponse.VitalMetric createMetric(String value, String unit, String status, PatientVitals v) {
+        return com.HMS.MediCare.dto.response.VitalsDashboardResponse.VitalMetric.builder()
+                .value(value)
+                .unit(unit)
+                .status(status)
+                .source(v.getDataSource() != null ? v.getDataSource() : "MANUAL")
+                .recordedAt(v.getRecordedAt().toString())
+                .timeAgo(getTimeAgo(v.getRecordedAt()))
+                .build();
+    }
+
+    private String getTimeAgo(java.time.LocalDateTime dateTime) {
+        java.time.Duration dur = java.time.Duration.between(dateTime, java.time.LocalDateTime.now());
+        long mins = dur.toMinutes();
+        if (mins < 60) return mins + "m ago";
+        long hours = dur.toHours();
+        if (hours < 24) return hours + "h ago";
+        long days = dur.toDays();
+        return days + "d ago";
+    }
+
+    private String checkBPStatus(int sys, int dia) {
+        if (sys > 140 || dia > 90) return "HIGH";
+        if (sys < 90 || dia < 60) return "LOW";
+        return "NORMAL";
+    }
+
+
     private PatientVitalsResponse mapToResponse(PatientVitals vitals) {
         PatientVitalsResponse response = PatientVitalsResponse.builder()
                 .id(vitals.getId())
@@ -113,6 +212,8 @@ public class PatientVitalsService {
                 .oxygenSaturation(vitals.getOxygenSaturation())
                 .bloodGlucose(vitals.getBloodGlucose())
                 .respiratoryRate(vitals.getRespiratoryRate())
+                .hemoglobin(vitals.getHemoglobin())
+                .dataSource(vitals.getDataSource())
                 .notes(vitals.getNotes())
                 .recordedAt(vitals.getRecordedAt())
                 .recordedBy(vitals.getRecordedBy())

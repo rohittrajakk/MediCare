@@ -24,6 +24,8 @@ public class PatientVitalsRequest {
     private Integer oxygenSaturation;
     private BigDecimal bloodGlucose;
     private Integer respiratoryRate;
+    private BigDecimal hemoglobin;
+    private String dataSource;
 
     private String notes;
     private String recordedBy;

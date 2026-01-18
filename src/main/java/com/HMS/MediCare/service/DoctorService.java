@@ -43,8 +43,11 @@ public class DoctorService {
             throw new DuplicateResourceException("Email already registered: " + request.getEmail());
         }
 
+        String uniqueId = generateUniqueId();
+
         Doctor doctor = Doctor.builder()
                 .name(request.getName())
+                .doctorUniqueId(uniqueId)
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
@@ -61,12 +64,23 @@ public class DoctorService {
         return mapToResponse(savedDoctor);
     }
 
+    private String generateUniqueId() {
+        java.util.Random random = new java.util.Random();
+        String uniqueId;
+        do {
+            int number = 1000 + random.nextInt(9000);
+            uniqueId = String.valueOf(number);
+        } while (doctorRepository.existsByDoctorUniqueId(uniqueId));
+        return uniqueId;
+    }
+
     public DoctorResponse login(LoginRequest request) {
-        Doctor doctor = doctorRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadRequestException("Invalid email or password"));
+        // Try to find by Unique ID first, assuming request.email contains the ID
+        Doctor doctor = doctorRepository.findByDoctorUniqueId(request.getEmail())
+                .orElseThrow(() -> new BadRequestException("Invalid Doctor ID or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), doctor.getPassword())) {
-            throw new BadRequestException("Invalid email or password");
+            throw new BadRequestException("Invalid Doctor ID or password");
         }
 
         return mapToResponse(doctor);
@@ -199,6 +213,7 @@ public class DoctorService {
                 .availableFrom(doctor.getAvailableFrom())
                 .availableTo(doctor.getAvailableTo())
                 .active(doctor.getActive())
+                .doctorUniqueId(doctor.getDoctorUniqueId())
                 .createdAt(doctor.getCreatedAt())
                 .build();
     }

@@ -14,8 +14,11 @@ public class MedicalRecordResponse {
     private String patientName;
     private Long doctorId;
     private String doctorName;
+    private String consultantName;
+    private java.time.LocalDate visitDate;
     private Long appointmentId;
     private String diagnosis;
+    private String symptoms;
     private String prescription;
     private String dosageInstructions;
     private String notes;

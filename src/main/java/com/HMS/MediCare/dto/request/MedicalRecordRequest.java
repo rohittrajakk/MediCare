@@ -12,10 +12,13 @@ public class MedicalRecordRequest {
     @NotNull(message = "Patient ID is required")
     private Long patientId;
 
-    @NotNull(message = "Appointment ID is required")
-    private Long appointmentId;
+    private Long appointmentId; // Optional for external records
+
+    private String consultantName;
+    private java.time.LocalDate visitDate;
 
     private String diagnosis;
+    private String symptoms;
 
     private String prescription;
 

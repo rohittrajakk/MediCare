@@ -1,22 +1,118 @@
 import { useState, useEffect } from 'react';
 import { patientApi } from '../services/api';
+import styled from 'styled-components';
+import { FaUser, FaSave } from 'react-icons/fa';
+
+// Styled Components
+const PageContainer = styled.div`
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const Header = styled.div`
+  margin-bottom: 2rem;
+  h1 {
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+  p {
+    color: #64748b;
+  }
+`;
+
+const Card = styled.div`
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+`;
+
+const FormGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+`;
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #475569;
+  }
+
+  input, select, textarea {
+    padding: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+  }
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+`;
+
+const Button = styled.button`
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.1s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+`;
+
+const StatusMessage = styled.div`
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background: ${props => props.type === 'error' ? '#fef2f2' : '#f0fdf4'};
+  color: ${props => props.type === 'error' ? '#ef4444' : '#16a34a'};
+  border: 1px solid ${props => props.type === 'error' ? '#fee2e2' : '#bbf7d0'};
+`;
 
 function ProfileSettings({ user, onUserUpdate }) {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        age: '',
-        gender: '',
-        bloodGroup: '',
-        address: '',
-        emergencyContact: '',
-        password: ''
-    });
+    const [message, setMessage] = useState({ type: '', text: '' });
     const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+
+    // Profile State
+    const [profileData, setProfileData] = useState({
+        name: '', email: '', phone: '', age: '', gender: '', 
+        bloodGroup: '', address: '', emergencyContact: '', password: ''
+    });
 
     useEffect(() => {
         fetchProfile();
@@ -24,339 +120,143 @@ function ProfileSettings({ user, onUserUpdate }) {
 
     const fetchProfile = async () => {
         if (!user?.id) return;
-        
-        setLoading(true);
         try {
             const response = await patientApi.getById(user.id);
             if (response.data.success) {
                 const data = response.data.data;
-                setFormData({
-                    name: data.name || '',
-                    email: data.email || '',
-                    phone: data.phone || '',
-                    age: data.age || '',
-                    gender: data.gender || '',
-                    bloodGroup: data.bloodGroup || '',
-                    address: data.address || '',
-                    emergencyContact: data.emergencyContact || '',
-                    password: ''
+                setProfileData({
+                    ...data,
+                    password: '' // Don't show password
                 });
             }
         } catch (err) {
-            setError('Failed to load profile. Please refresh the page.');
+            setMessage({ type: 'error', text: 'Failed to load profile' });
+        }
+    };
+
+    const handleProfileSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const payload = { ...profileData, age: parseInt(profileData.age) };
+            if (!payload.password) delete payload.password;
+
+            const response = await patientApi.update(user.id, payload);
+            if (response.data.success) {
+                setMessage({ type: 'success', text: 'Profile updated successfully!' });
+                if (onUserUpdate) onUserUpdate(response.data.data);
+            }
+        } catch (err) {
+            setMessage({ type: 'error', text: err.response?.data?.message || 'Update failed' });
         } finally {
             setLoading(false);
         }
     };
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-        setError('');
-        setSuccess('');
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setSuccess('');
-        setSaving(true);
-
-        try {
-            const payload = {
-                ...formData,
-                age: formData.age ? parseInt(formData.age) : null
-            };
-            
-            // Remove password if empty (don't update)
-            if (!payload.password) {
-                delete payload.password;
-            }
-
-            const response = await patientApi.update(user.id, payload);
-            
-            if (response.data.success) {
-                setSuccess('Profile updated successfully!');
-                // Update user data in parent component
-                if (onUserUpdate) {
-                    onUserUpdate(response.data.data);
-                }
-                // Clear password field after successful update
-                setFormData(prev => ({ ...prev, password: '' }));
-            } else {
-                setError(response.data.message || 'Failed to update profile');
-            }
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to update profile. Please try again.');
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="page-container">
-                <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    minHeight: '400px',
-                    color: 'var(--gray-500)'
-                }}>
-                    <span>Loading profile...</span>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="page-container">
-            <div className="page-header">
+        <PageContainer>
+            <Header>
                 <h1>Profile Settings</h1>
-                <p style={{ color: 'var(--gray-500)', marginTop: '0.5rem' }}>
-                    Complete your profile to help us serve you better
-                </p>
-            </div>
+                <p>Manage your personal information and account security</p>
+            </Header>
 
-            <div className="profile-settings-card" style={{
-                background: 'white',
-                borderRadius: 'var(--radius-lg)',
-                padding: '2rem',
-                boxShadow: 'var(--shadow)'
-            }}>
-                {error && (
-                    <div className="alert alert-error" style={{ marginBottom: '1.5rem' }}>
-                        ⚠️ {error}
-                    </div>
-                )}
-                
-                {success && (
-                    <div className="alert alert-success" style={{ 
-                        marginBottom: '1.5rem',
-                        background: '#ecfdf5',
-                        color: '#059669',
-                        padding: '1rem',
-                        borderRadius: 'var(--radius)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                    }}>
-                        ✅ {success}
-                    </div>
-                )}
+            {message.text && (
+                <StatusMessage type={message.type}>
+                    {message.text}
+                </StatusMessage>
+            )}
 
-                <form onSubmit={handleSubmit}>
-                    <div style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-                        gap: '1.5rem' 
-                    }}>
-                        {/* Basic Information */}
-                        <div className="form-section">
-                            <h3 style={{ 
-                                marginBottom: '1rem', 
-                                color: 'var(--gray-700)',
-                                fontSize: '1rem',
-                                fontWeight: '600',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem'
-                            }}>
-                                👤 Basic Information
-                            </h3>
-                            
-                            <div className="form-group">
-                                <label className="form-label">Full Name *</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    className="form-input"
-                                    placeholder="Enter your full name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
+            <Card>
+                <form onSubmit={handleProfileSubmit}>
+                    <SectionTitle>Personal Information</SectionTitle>
+                    <FormGrid>
+                        <FormGroup>
+                            <label>Full Name</label>
+                            <input 
+                                value={profileData.name || ''} 
+                                onChange={e => setProfileData({...profileData, name: e.target.value})} 
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <label>Email</label>
+                            <input 
+                                type="email" 
+                                value={profileData.email || ''} 
+                                onChange={e => setProfileData({...profileData, email: e.target.value})} 
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <label>Phone</label>
+                            <input 
+                                value={profileData.phone || ''} 
+                                onChange={e => setProfileData({...profileData, phone: e.target.value})} 
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <label>Age</label>
+                            <input 
+                                type="number" 
+                                value={profileData.age || ''} 
+                                onChange={e => setProfileData({...profileData, age: e.target.value})} 
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <label>Gender</label>
+                            <select 
+                                value={profileData.gender || ''} 
+                                onChange={e => setProfileData({...profileData, gender: e.target.value})}
+                            >
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </FormGroup>
+                        <FormGroup>
+                            <label>Blood Group</label>
+                            <input 
+                                value={profileData.bloodGroup || ''} 
+                                onChange={e => setProfileData({...profileData, bloodGroup: e.target.value})} 
+                            />
+                        </FormGroup>
+                    </FormGrid>
 
-                            <div className="form-group">
-                                <label className="form-label">Email *</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    className="form-input"
-                                    placeholder="Enter your email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
+                    <SectionTitle>Address & Emergency</SectionTitle>
+                    <FormGrid>
+                        <FormGroup>
+                            <label>Address</label>
+                            <input 
+                                value={profileData.address || ''} 
+                                onChange={e => setProfileData({...profileData, address: e.target.value})} 
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <label>Emergency Contact</label>
+                            <input 
+                                value={profileData.emergencyContact || ''} 
+                                onChange={e => setProfileData({...profileData, emergencyContact: e.target.value})} 
+                            />
+                        </FormGroup>
+                    </FormGrid>
+                    
+                    <SectionTitle>Security</SectionTitle>
+                    <FormGrid>
+                            <FormGroup>
+                            <label>New Password (leave blank to keep current)</label>
+                            <input 
+                                type="password"
+                                value={profileData.password || ''} 
+                                onChange={e => setProfileData({...profileData, password: e.target.value})} 
+                            />
+                        </FormGroup>
+                    </FormGrid>
 
-                            <div className="form-group">
-                                <label className="form-label">Phone</label>
-                                <input
-                                    type="tel"
-                                    name="phone"
-                                    className="form-input"
-                                    placeholder="Enter phone number"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Personal Details */}
-                        <div className="form-section">
-                            <h3 style={{ 
-                                marginBottom: '1rem', 
-                                color: 'var(--gray-700)',
-                                fontSize: '1rem',
-                                fontWeight: '600',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem'
-                            }}>
-                                📋 Personal Details
-                            </h3>
-
-                            <div className="form-group">
-                                <label className="form-label">Age</label>
-                                <input
-                                    type="number"
-                                    name="age"
-                                    className="form-input"
-                                    placeholder="Your age"
-                                    value={formData.age}
-                                    onChange={handleChange}
-                                    min="0"
-                                    max="150"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Gender</label>
-                                <select
-                                    name="gender"
-                                    className="form-select"
-                                    value={formData.gender}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">Select Gender</option>
-                                    <option value="MALE">Male</option>
-                                    <option value="FEMALE">Female</option>
-                                    <option value="OTHER">Other</option>
-                                </select>
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Blood Group</label>
-                                <select
-                                    name="bloodGroup"
-                                    className="form-select"
-                                    value={formData.bloodGroup}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">Select Blood Group</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Contact & Emergency */}
-                        <div className="form-section">
-                            <h3 style={{ 
-                                marginBottom: '1rem', 
-                                color: 'var(--gray-700)',
-                                fontSize: '1rem',
-                                fontWeight: '600',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem'
-                            }}>
-                                🏠 Contact & Emergency
-                            </h3>
-
-                            <div className="form-group">
-                                <label className="form-label">Address</label>
-                                <textarea
-                                    name="address"
-                                    className="form-input form-textarea"
-                                    placeholder="Enter your address"
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                    rows="2"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="form-label">Emergency Contact</label>
-                                <input
-                                    type="tel"
-                                    name="emergencyContact"
-                                    className="form-input"
-                                    placeholder="Emergency contact number"
-                                    value={formData.emergencyContact}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Security */}
-                        <div className="form-section">
-                            <h3 style={{ 
-                                marginBottom: '1rem', 
-                                color: 'var(--gray-700)',
-                                fontSize: '1rem',
-                                fontWeight: '600',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem'
-                            }}>
-                                🔒 Security
-                            </h3>
-
-                            <div className="form-group">
-                                <label className="form-label">New Password</label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    className="form-input"
-                                    placeholder="Leave blank to keep current"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    minLength={6}
-                                />
-                                <small style={{ color: 'var(--gray-500)', fontSize: '0.75rem' }}>
-                                    Only fill this if you want to change your password
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style={{ 
-                        marginTop: '2rem', 
-                        paddingTop: '1.5rem', 
-                        borderTop: '1px solid var(--gray-200)',
-                        display: 'flex',
-                        justifyContent: 'flex-end'
-                    }}>
-                        <button 
-                            type="submit" 
-                            className="btn btn-primary btn-lg" 
-                            disabled={saving}
-                            style={{ minWidth: '200px' }}
-                        >
-                            {saving ? '⏳ Saving...' : '💾 Save Changes'}
-                        </button>
-                    </div>
+                    <Button type="submit" disabled={loading}>
+                        <FaSave /> {loading ? 'Saving...' : 'Save Profile'}
+                    </Button>
                 </form>
-            </div>
-        </div>
+            </Card>
+        </PageContainer>
     );
 }
 

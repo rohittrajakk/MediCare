@@ -33,6 +33,7 @@ public class VitalsController {
 
     private final VitalsMonitoringService vitalsMonitoringService;
     private final HealthInsightsService healthInsightsService;
+    private final com.HMS.MediCare.service.PatientVitalsService patientVitalsService;
 
     @PostMapping("/record")
     @Operation(summary = "Record vital reading", description = "Record a vital sign and check for threshold violations")
@@ -57,6 +58,22 @@ public class VitalsController {
         }
         
         return ResponseEntity.ok(ApiResponse.success("Vital recorded", result));
+    }
+
+    @PostMapping("/add")
+    @Operation(summary = "Add manual vitals", description = "Add comprehensive manual vitals record")
+    public ResponseEntity<ApiResponse<com.HMS.MediCare.dto.response.PatientVitalsResponse>> addVitals(
+            @RequestParam Long patientId,
+            @RequestBody com.HMS.MediCare.dto.request.PatientVitalsRequest request
+    ) {
+        com.HMS.MediCare.dto.response.PatientVitalsResponse response = patientVitalsService.recordVitals(patientId, request);
+        return ResponseEntity.ok(ApiResponse.success("Vitals recorded successfully", response));
+    }
+
+    @GetMapping("/dashboard/{patientId}")
+    @Operation(summary = "Get 3D Vitals Dashboard Data", description = "Aggregated vitals and conditions for the 3D dashboard")
+    public ResponseEntity<ApiResponse<com.HMS.MediCare.dto.response.VitalsDashboardResponse>> getDashboard(@PathVariable Long patientId) {
+        return ResponseEntity.ok(ApiResponse.success("Dashboard data fetched", patientVitalsService.getPatientHealthDashboard(patientId)));
     }
 
     @PostMapping("/record-multiple")

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { patientApi, adminApi } from '../services/api';
+import { patientApi, doctorApi, adminApi } from '../services/api';
 
 // Google OAuth Client ID from environment
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -154,6 +154,14 @@ function Login({ onLogin }) {
                 } else {
                     setError(response.data.message || 'Invalid email or password');
                 }
+            } else if (userType === 'doctor') {
+                const response = await doctorApi.login(formData);
+                if (response.data.success) {
+                    onLogin(response.data.data, 'doctor');
+                    navigate('/');
+                } else {
+                    setError(response.data.message || 'Invalid ID or password');
+                }
             } else if (userType === 'admin') {
                 // Admin authentication via backend API
                 const response = await adminApi.login(formData);
@@ -193,7 +201,7 @@ function Login({ onLogin }) {
                 )}
 
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                    {['patient', 'admin'].map((type) => (
+                    {['patient', 'doctor', 'admin'].map((type) => (
                         <button
                             key={type}
                             type="button"
@@ -202,9 +210,10 @@ function Login({ onLogin }) {
                             onClick={() => {
                                 setUserType(type);
                                 setError('');
+                                setFormData({ email: '', password: '' });
                             }}
                         >
-                            {type === 'patient' ? '👤 Patient' : '🔐 Admin'}
+                            {type === 'patient' ? '👤 Patient' : type === 'doctor' ? '👨‍⚕️ Doctor' : '🔐 Admin'}
                         </button>
                     ))}
                 </div>
@@ -267,16 +276,18 @@ function Login({ onLogin }) {
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label className="form-label">Email</label>
+                        <label className="form-label">
+                            {userType === 'doctor' ? 'Doctor ID' : 'Email'}
+                        </label>
                         <input
-                            type="email"
+                            type={userType === 'doctor' ? 'text' : 'email'}
                             name="email"
                             className="form-input"
-                            placeholder="Enter your email"
+                            placeholder={userType === 'doctor' ? 'Enter your 4-digit ID' : 'Enter your email'}
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            autoComplete="email"
+                            autoComplete={userType === 'doctor' ? 'off' : 'email'}
                         />
                     </div>
 

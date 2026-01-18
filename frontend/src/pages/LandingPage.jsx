@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function LandingPage() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -128,20 +129,43 @@ function LandingPage() {
                         </Link>
                     </div>
 
-                    <div className="hero-stats">
-                        <div className="stat" style={{ background: currentQuote.bg, transition: 'all 0.5s ease' }}>
+                    <motion.div 
+                        className="hero-stats"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            hidden: {},
+                            visible: { transition: { staggerChildren: 0.15 } }
+                        }}
+                    >
+                        <motion.div 
+                            className="stat glass-card" 
+                            style={{ background: currentQuote.bg, transition: 'all 0.5s ease' }}
+                            variants={{ hidden: { opacity: 0, y: 20, scale: 0.9 }, visible: { opacity: 1, y: 0, scale: 1 } }}
+                            whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                        >
                             <span className="stat-value" style={{ color: currentQuote.color }}>150+</span>
                             <span className="stat-label" style={{ color: currentQuote.color, opacity: 0.8 }}>Doctors</span>
-                        </div>
-                        <div className="stat" style={{ background: currentQuote.bg, transition: 'all 0.5s ease' }}>
+                        </motion.div>
+                        <motion.div 
+                            className="stat glass-card" 
+                            style={{ background: currentQuote.bg, transition: 'all 0.5s ease' }}
+                            variants={{ hidden: { opacity: 0, y: 20, scale: 0.9 }, visible: { opacity: 1, y: 0, scale: 1 } }}
+                            whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                        >
                             <span className="stat-value" style={{ color: currentQuote.color }}>10K+</span>
                             <span className="stat-label" style={{ color: currentQuote.color, opacity: 0.8 }}>Patients</span>
-                        </div>
-                        <div className="stat" style={{ background: currentQuote.bg, transition: 'all 0.5s ease' }}>
+                        </motion.div>
+                        <motion.div 
+                            className="stat glass-card" 
+                            style={{ background: currentQuote.bg, transition: 'all 0.5s ease' }}
+                            variants={{ hidden: { opacity: 0, y: 20, scale: 0.9 }, visible: { opacity: 1, y: 0, scale: 1 } }}
+                            whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                        >
                             <span className="stat-value" style={{ color: currentQuote.color }}>4.9★</span>
                             <span className="stat-label" style={{ color: currentQuote.color, opacity: 0.8 }}>Rating</span>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
 
                     <div className="quote-dots">
                         {healthQuotes.slice(0, 15).map((_, i) => (
@@ -150,10 +174,41 @@ function LandingPage() {
                     </div>
                 </div>
 
-                {/* VISUALS - RIGHT SIDE (New Hero Character) */}
+                {/* VISUALS - RIGHT SIDE with Floating 3D Elements */}
                 <div className="hero-visual">
-                    {/* Happy Patient - Floating Left of Doctor (Grouped) */}
-                    <div className="anime-wrapper w-patient">
+                    {/* Floating 3D Medical Elements */}
+                    <motion.img 
+                        src="/assets/heart-3d-transparent.png"
+                        alt="3D Heart"
+                        className="floating-med-element"
+                        style={{ position: 'absolute', top: '10%', right: '60%', width: '70px', pointerEvents: 'none' }}
+                        animate={{ y: [0, -15, 0], rotate: [-5, 5, -5] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    <motion.img 
+                        src="/assets/pills-3d.png"
+                        alt="3D Pills"
+                        className="floating-med-element"
+                        style={{ position: 'absolute', bottom: '20%', right: '70%', width: '50px', pointerEvents: 'none' }}
+                        animate={{ y: [0, -10, 0], rotate: [0, 10, 0] }}
+                        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                    />
+                    <motion.img 
+                        src="/assets/clay-stethoscope-transparent.png"
+                        alt="3D Stethoscope"
+                        className="floating-med-element"
+                        style={{ position: 'absolute', top: '60%', right: '80%', width: '55px', pointerEvents: 'none' }}
+                        animate={{ y: [0, -12, 0] }}
+                        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                    />
+                    
+                    {/* Happy Patient Character */}
+                    <motion.div 
+                        className="anime-wrapper w-patient"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                    >
                         <div className="float-card card-patient">
                             <span>Ready to help! 🧑‍⚕️</span>
                         </div>
@@ -162,7 +217,7 @@ function LandingPage() {
                             alt="Patient"
                             className="img-anime"
                         />
-                    </div>
+                    </motion.div>
 
                 </div>
             </section>
