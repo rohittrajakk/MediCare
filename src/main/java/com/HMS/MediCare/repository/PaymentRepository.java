@@ -2,6 +2,7 @@ package com.HMS.MediCare.repository;
 
 import com.HMS.MediCare.entity.Payment;
 import com.HMS.MediCare.enums.PaymentStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +15,12 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
+
+    @Override
+    @EntityGraph(attributePaths = {"patient", "doctor"})
+    List<Payment> findAll();
     
+    @EntityGraph(attributePaths = {"patient", "doctor"})
     List<Payment> findByPatientId(Long patientId);
     
     List<Payment> findByDoctorId(Long doctorId);
